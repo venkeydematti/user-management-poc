@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 
 const data = [
@@ -19,7 +19,12 @@ export default function Login() {
         setActiveImageIndex((activeImageIndex + 1) % data.length);
     }
     
-
+    useEffect(() =>{
+        const timer = setTimeout(() => {
+            handleNextClick();
+        },2000);
+        return () => clearTimeout(timer);
+    },[activeImageIndex]);
 
     return (
         <div>
