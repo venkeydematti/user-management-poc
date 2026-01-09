@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";  
 
-export default function UserList({ users }) {
+export default function UserList({ users, onEditUser, onDeleteUser }) {
     //For checking if the user list is empty
   if (users.length === 0) {
     return <p className="text-gray-500">No users added yet.</p>;
@@ -27,10 +27,10 @@ export default function UserList({ users }) {
             <TableCell>{user.email}</TableCell>
 
             <TableCell className="text-right space-x-2">
-              <Button disabled variant="outline">
+              <Button onClick={() => onEditUser(user)} variant="outline">
                 Edit
               </Button>
-              <Button disabled variant="destructive">
+              <Button onClick={() => onDeleteUser(user.id)} variant="destructive">
                 Delete
               </Button>
             </TableCell>

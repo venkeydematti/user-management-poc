@@ -13,7 +13,12 @@ import {
     DialogTrigger,
   } from "@/components/ui/dialog";
 
-export default function AddUserDialog({onAddUser}) {
+  export default function AddUserDialog({
+    onAddUser,
+    onUpdateUser,
+    selectedUser,
+    onClearSelection
+  }) {
     //For storing the user's name and email
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -24,30 +29,60 @@ export default function AddUserDialog({onAddUser}) {
     //For showing the success message after submission
     const [successMessage, setSuccessMessage] = useState("");
 
+    // Open dialog & prefill when editing
+    useEffect(() => {
+      if (selectedUser) {
+        setName(selectedUser.name);
+        setEmail(selectedUser.email);
+        setOpen(true);
+      }
+    }, [selectedUser]);
+
     //For handling the form submission
     const handleSubmit = (e) => {
-        e.preventDefault();
-        if(!name || !email) return;
-
-        //For adding the user to the list
-        onAddUser({
-            id: Date.now(),
-            name,
-            email,
+      e.preventDefault();
+      if(!name || !email) return;
+      console.log("SUBMIT CLICKED", { name, email, selectedUser });
+      //For adding the user to the list
+      if (selectedUser) {
+        onUpdateUser({
+          ...selectedUser,
+          name,
+          email,
         });
-        //For showing the success message after submission  
+        setSuccessMessage("User updated successfully");
+      } else {
+        onAddUser({
+          id: Date.now(),
+          name,
+          email,
+        });
         setSuccessMessage("User added successfully");
-        //For clearing the form after submission
-        setName("");
-        setEmail("");
-        //For hiding the dialog after submission
-        setOpen(false);
+      }
+
+      //Clear the edit mode
+      onClearSelection();   // clear edit mode
+      setOpen(false);       // close dialog
+      setName("");          // reset form
+      setEmail("");
+      //For showing the success message after submission
+      setSuccessMessage("User added successfully");
     }
 
-    // Autohide the success message after 3 seconds
+    // Open dialog & prefill when editing
+    useEffect(() => {
+      if (!selectedUser) return;
+      setName(selectedUser.name);
+      setEmail(selectedUser.email);
+      setOpen(true);
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
+    }, [selectedUser]);
+
+    // Autohide the success message
     useEffect(() => {
       if (!successMessage) return;
-    
       const timer = setTimeout(() => {
         setSuccessMessage("");
       }, 3000);
@@ -69,7 +104,7 @@ export default function AddUserDialog({onAddUser}) {
           )}
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New User</DialogTitle>
+            <DialogTitle>{selectedUser ? "Edit User" : "Add User"}</DialogTitle>
           </DialogHeader>
   
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -81,6 +116,7 @@ export default function AddUserDialog({onAddUser}) {
                 placeholder="Enter name"
                 name="name"
                 id="name"
+                type="text"
               />
             </div>
   
@@ -92,6 +128,7 @@ export default function AddUserDialog({onAddUser}) {
                 placeholder="Enter email"
                 name="email"
                 id="email"
+                type="email"
               />
             </div>
   

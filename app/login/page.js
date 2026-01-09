@@ -26,6 +26,9 @@ export default function Login() {
         return () => clearTimeout(timer);
     },[activeImageIndex]);
 
+    //Testing
+    const [count, setCount] = useState(0);
+
     return (
         <div>
             <div className="flex flex-col items-center justify-center m-5">
@@ -38,6 +41,14 @@ export default function Login() {
             ))}
             <button className="py-4 m-5" onClick={handleNextClick}>Next</button>
         </div>
+        
+         <button onClick={() => setCount(count + 1)} className="bg-blue-500 text-white p-2 rounded-md">Increment</button>
+         <p>You clicked {count} times</p>
+         <button onClick={() => setCount(count - 1)} className="bg-red-500 text-white p-2 rounded-md">Decrement</button>
+
+         <div className="flex flex-col items-center justify-center">
+             
+         </div>
         </div>
     )
 }
