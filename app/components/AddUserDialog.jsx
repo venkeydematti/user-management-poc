@@ -29,20 +29,10 @@ import {
     //For showing the success message after submission
     const [successMessage, setSuccessMessage] = useState("");
 
-    // Open dialog & prefill when editing
-    useEffect(() => {
-      if (selectedUser) {
-        setName(selectedUser.name);
-        setEmail(selectedUser.email);
-        setOpen(true);
-      }
-    }, [selectedUser]);
-
     //For handling the form submission
     const handleSubmit = (e) => {
       e.preventDefault();
       if(!name || !email) return;
-      console.log("SUBMIT CLICKED", { name, email, selectedUser });
       //For adding the user to the list
       if (selectedUser) {
         onUpdateUser({
@@ -65,8 +55,6 @@ import {
       setOpen(false);       // close dialog
       setName("");          // reset form
       setEmail("");
-      //For showing the success message after submission
-      setSuccessMessage("User added successfully");
     }
 
     // Open dialog & prefill when editing
@@ -103,6 +91,7 @@ import {
             </p>
           )}
         <DialogContent>
+          
           <DialogHeader>
             <DialogTitle>{selectedUser ? "Edit User" : "Add User"}</DialogTitle>
           </DialogHeader>
@@ -134,6 +123,7 @@ import {
   
             <Button type="submit">Save User</Button>
           </form>
+
         </DialogContent>
       </Dialog>
     )

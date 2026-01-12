@@ -10,7 +10,7 @@ export default function Home() {
   //For storing the selected user ( Eidt / Delete )
   const [selectedUser, setSelectedUser] = useState(null)
 
-
+  console.log(users);
   //For adding a new user to the list
   function handleAddUser(newUser) {
     setUsers((prev) => [...prev, newUser]);
