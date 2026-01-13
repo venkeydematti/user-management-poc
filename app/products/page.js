@@ -45,7 +45,7 @@ export default function TestPage() {
 
         <div className="grid grid-cols-4 gap-4 mt-4">
           {products.map((product) => (
-            <div key={product.id}>
+            <div key={product.id} className="relative group">
               <img
                 alt={product.title}
                 src={product.thumbnail}
