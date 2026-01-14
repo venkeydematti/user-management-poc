@@ -8,8 +8,8 @@ const groq = new Groq({
 export async function POST(request) {
     try {
         const { text } = await request.json();
-        if (!text) {
-            return NextResponse.json({ error: "Text is required" }, { status: 400 });
+        if (!text || !text.trim()) {
+            return NextResponse.json({ filters: null });
         }
 
         const completion = await groq.chat.completions.create({
@@ -19,25 +19,25 @@ export async function POST(request) {
                 {
                     role: "system",
                     content: `
-Return ONLY valid JSON.
+                        Return ONLY valid JSON.
 
-Rules:
-- "query" must be a SINGLE keyword or category
-- Remove words like "under", "below", numbers, currency
+                        Rules:
+                        - "query" must be a SINGLE keyword or category
+                        - Remove words like "under", "below", numbers, currency
 
-Schema:
-{
-  "query": string | null,
-  "maxPrice": number | null
-}
+                        Schema:
+                        {
+                        "query": string | null,
+                        "maxPrice": number | null
+                        }
 
-Examples:
-User: "groceries under 400"
-Output: {"query":"groceries","maxPrice":400}
+                        Examples:
+                        User: "groceries under 400"
+                        Output: {"query":"groceries","maxPrice":400}
 
-User: "chicken below 100"
-Output: {"query":"chicken","maxPrice":100}
-`
+                        User: "chicken below 100"
+                        Output: {"query":"chicken","maxPrice":100}
+                        `
                 },
                 { role: "user", content: text },
             ],
@@ -52,10 +52,7 @@ Output: {"query":"chicken","maxPrice":100}
         } catch {
             console.error("Invalid AI response:", response);
             // Response sent to FE
-            return NextResponse.json(
-                { error: "Invalid AI response format" },
-                { status: 500 }
-            );
+            return NextResponse.json({ filters: null });
         }
 
         return NextResponse.json({ filters });
