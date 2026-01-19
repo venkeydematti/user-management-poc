@@ -5,8 +5,12 @@ import { useState } from "react";
 export default function AIFilterBar({ onApply }){
     const [input, setInput] = useState("");
     
+    // Enable button only if input has at least 3 non-space characters
+  const isSearchEnabled = input.trim().length >= 3;
+  console.log("isSearchEnabled", isSearchEnabled);
+
     const handleApply = () => {
-        if (!input.trim()) return;
+        if (!isSearchEnabled) return; 
         console.log("Applying AI filter with input:", input);
         onApply(input);
     }
@@ -18,8 +22,9 @@ export default function AIFilterBar({ onApply }){
 
     const handleInputChange = (e) => {
       setInput(e.target.value);
+      // Clear the filters if the input is empty
       if (!e.target.value.trim()) {
-        onApply("");
+        onApply(""); // Clear the filters
       }
     };
 
@@ -49,7 +54,7 @@ export default function AIFilterBar({ onApply }){
           <Button
             variant="outline"
             onClick={handleApply}
-            disabled={!input.trim()}
+            disabled={!isSearchEnabled}
           >
             AI Filter
           </Button>
