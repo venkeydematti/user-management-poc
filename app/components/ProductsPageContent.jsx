@@ -1,26 +1,49 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import AIFilterBar from "../components/AIFilterBar";
-import ProductsList from "../components/ProductsList";
+import dynamic from "next/dynamic";
 import { fetchProducts } from "../lib/api/fetchProducts";
 
+// Lazy loading the components
+const AIFilterBar = dynamic(
+  () => import("../components/AIFilterBar"),
+  { ssr: false }
+);
+const ProductsList = dynamic(
+  () => import("../components/ProductsList"),
+  { ssr: false }
+);
+
+
 export default function ProductsPageContent() {
-  const { data: products = [], isLoading, error } = useQuery({
+  const { 
+    data: products = [], 
+    isLoading, 
+    error, 
+  } = useQuery({
     queryKey: ["products"],
     queryFn: fetchProducts,
     staleTime: 60_000,
   });
 
+  // AI filter state (UI state)
   const [filters, setFilters] = useState(null);
   const [aiUnderstood, setAiUnderstood] = useState(true);
 
+  // Debounce the AI filter input
+  const debounceRef = useRef(null);
+  const lastQueryRef = useRef("");
+
+
+  //For filtering the products based on the filters
   const filteredProducts = useMemo(() => {
     if (!filters) return products;
 
+    //Get the query and the max price from the filters ( AI filter response )
     const query = filters.query?.toLowerCase();
 
+    //Filter the products based on the query and the max price
     return products.filter((product) => {
       const title = product.title.toLowerCase();
       const category = product.category.toLowerCase();
@@ -36,18 +59,29 @@ export default function ProductsPageContent() {
     });
   }, [products, filters]);
 
+
+
+  //For applying the AI filter API call
   const applyAIFilter = async (text) => {
-    if (!text.trim() || text.trim().length < 3) {
+    const cleanedText = text.trim();
+    if (!cleanedText || cleanedText.length < 3) {
       setFilters(null);
       setAiUnderstood(true);
+      lastQueryRef.current = "";
+      console.log("Cleaned text is too short");
       return;
     }
+
+
+    // Prevent same query API calls
+    if (cleanedText === lastQueryRef.current) return;
+    lastQueryRef.current = cleanedText;
 
     try {
       const res = await fetch("/api/ai-filter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text: cleanedText }),
       });
 
       const data = await res.json();
@@ -67,12 +101,33 @@ export default function ProductsPageContent() {
     }
   };
 
-  if (isLoading) return <p>Loading products…</p>;
-  if (error) return <p>Failed to load products</p>;
+  // Debounce wrapper
+  const debouncedApplyAIFilter = (text) => {
+    clearTimeout(debounceRef.current);
+
+    debounceRef.current = setTimeout(() => {
+      applyAIFilter(text);
+    }, 400);
+  };
+
+
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
+      </div>
+    );
+
+  if (error) 
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-red-500">Failed to load products</p>
+      </div>
+    );
 
   return (
     <>
-      <AIFilterBar onApply={applyAIFilter} />
+      <AIFilterBar onApply={debouncedApplyAIFilter} />
 
       {!aiUnderstood && (
         <p className="text-sm mt-4 rounded-md text-black-500">

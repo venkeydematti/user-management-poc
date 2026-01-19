@@ -10,7 +10,7 @@ export default function Header() {
             <Link href="/products" className="text-sm text-gray-500 hover:text-gray-700">Products ( Using useEffect )</Link>
             <Link href="/products-query" className="text-sm text-gray-500 hover:text-gray-700">Products ( Using Tanstack Query)</Link>
             <Link href="/login">  
-                <Button variant="outline">Sign In</Button>
+                <Button variant="outline" disabled={true}>Sign In ( Disabled )</Button>
             </Link>
         </header>
   );
