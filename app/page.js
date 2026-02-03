@@ -37,7 +37,7 @@ export default function Home() {
 
 
   return (
-    <main className="p-6 space-y-6 w-full max-w-7xl mx-auto">
+    <main className="flex-1 p-6 space-y-6 w-full max-w-7xl mx-auto">
       <AddUserDialog
         onAddUser={handleAddUser}
         onUpdateUser={handleUpdateUser}

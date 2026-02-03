@@ -1,72 +1,21 @@
 "use client";
-import { useState, useEffect } from "react";
 
-export default function TestPage() {
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ProductsPageContent from "../components/ProductsPageContent";
 
-    const [isLoading, setLoading] = useState(false);
-    const [products, setProducts] = useState([]);
-    const [error, setError] = useState(null);
+const queryClient = new QueryClient();
 
-    const url = "https://dummyjson.com/products";
-
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const res = await fetch(url)
-                const data = await res.json();
-                setProducts(data.products);
-                setLoading(false);
-            } catch (err) {
-                setError(err.message);
-                setLoading(false);
-            }
-         };
-        fetchData();
-    }, []);
-
-    if(isLoading) {
-        return <div className="flex justify-center items-center h-screen">
-            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
-        </div>;
-    }
-
-    if(error) {
-        return <div className="flex justify-center items-center h-screen">
-            <p className="text-red-500">{error}</p>
-        </div>;
-    }
-
-    return (
-        <div className="bg-white">
-      <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-        <h2 className="text-2xl font-bold tracking-tight text-gray-900">Customers also purchased</h2>
-
-        <div className="grid grid-cols-4 gap-4 mt-4">
-          {products.map((product) => (
-            <div key={product.id} className="relative group">
-              <img
-                alt={product.title}
-                src={product.thumbnail}
-                className="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80"
-              />
-              <div className="flex flex-wrap text-center justify-between">
-                <div className="text-center justify-center">
-                  <h3 className="text-sm text-gray-700">
-                    <a href={product.href}>
-                      <span aria-hidden="true" className="absolute inset-0" />
-                      {product.name}
-                    </a>
-                  </h3>
-                  <p className="mt-1 text-sm text-gray-500">{product.category}</p>
-                </div>
-                <p className="text-sm font-medium text-gray-900">Rs.{product.price}</p>
-              </div>
-            </div>
-          ))}
+export default function ProductsQueryPage() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <div className="bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-16">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            AI-assisted Product Search using Tanstack Query & Groq ( LLM - Llama 3.1-8b-instant )
+          </h2>
+          <ProductsPageContent />
         </div>
       </div>
-    </div>
-    )
-}   
+    </QueryClientProvider>
+  );
+}
